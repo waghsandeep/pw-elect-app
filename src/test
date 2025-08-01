@@ -1,0 +1,142 @@
+import React, { useState, useEffect } from 'react';
+import Papa from 'papaparse';
+import './App.css';  // Assuming external CSS file for styling
+
+const CSVTable = () => {
+  const [csvData, setCsvData] = useState([]);
+  const [headers, setHeaders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Columns to ignore (by name)
+  const columnsToIgnore = [
+    'E_FIRST_NAME', 'E_MIDDLE_NAME', 'E_LAST_NAME', 'MOBILE_NO1',
+    'HOUSE_NO', 'L_ADDRESS'
+  ];
+
+  // Fetch the CSV file from the public folder
+  useEffect(() => {
+    const fetchCSVData = async () => {
+      try {
+        const response = await fetch('/data.csv'); // Fetching from the public folder
+        const csvText = await response.text();
+
+        // Parse the CSV data
+        Papa.parse(csvText, {
+          complete: (result) => {
+            const data = result.data;
+            const headerRow = data[0];
+
+            // Remove unwanted columns based on names in the columnsToIgnore list
+            const filteredHeaders = headerRow.filter((header) => !columnsToIgnore.includes(header));
+            const filteredData = data.slice(1).map((row) =>
+              row.filter((_, index) => !columnsToIgnore.includes(headerRow[index]))
+            );
+
+            setHeaders(filteredHeaders);  // Set filtered headers
+            setCsvData(filteredData);     // Set filtered data
+          },
+          header: false, // Don't treat the first row as headers in raw data
+        });
+      } catch (error) {
+        console.error('Error fetching CSV:', error);
+      }
+    };
+
+    fetchCSVData();  // Fetch and parse the CSV file
+  }, []);
+
+  // Function to handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Filter the data based on the search query (searching through full name and VCARDID columns)
+  const filteredData = csvData.filter((row) => {
+    // Split the search query into words
+    const queryWords = searchQuery.toLowerCase().split(' ').filter(Boolean);
+
+    // Get the relevant columns for searching (L_FULLNAME, E_FULLNAME, and VCARDID)
+    const fullNameColumns = [
+      row[headers.indexOf('L_FULLNAME')],
+      row[headers.indexOf('E_FULLNAME')],
+      row[headers.indexOf('VCARDID')]  // Include VCARDID column for searching
+    ];
+
+    // Iterate through the query words and check if any match with any column
+    return queryWords.every(queryWord =>
+      fullNameColumns.some(column =>
+        column && column.toLowerCase().includes(queryWord) // Match query word with full name or VCARDID
+      )
+    );
+  });
+
+  // Sort the filtered data: first by age (descending), then by "SRNO" (ascending)
+  const sortedData = filteredData
+    .sort((a, b) => {
+      // Sorting by "SRNO" second (ascending order)
+      const srnoA = parseInt(a[headers.indexOf('SRNO')], 10);
+      const srnoB = parseInt(b[headers.indexOf('SRNO')], 10);
+      return srnoA - srnoB;
+    })
+    .sort((a, b) => {
+      // Sorting by age first (descending order)
+      const ageA = parseInt(a[headers.indexOf('AGE')], 10);
+      const ageB = parseInt(b[headers.indexOf('AGE')], 10);
+      if (!isNaN(ageA) && !isNaN(ageB)) {
+        return ageB - ageA; // Descending order (largest age first)
+      }
+      return 0; // If age is missing or not a number, leave as is
+    })
+
+  return (
+    <div className="container">
+      <h1 className="title">CSV Data Search and Display</h1>
+
+      <div className="search-container">
+        {/* Search Input */}
+        <input
+          type="text"
+          placeholder="Search by Full Name or VCARDID"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="search-input"
+        />
+        {/* Display the count of results in the top-right corner */}
+        <div className="result-count">
+          <span>{sortedData.length} results found</span>
+        </div>
+      </div>
+
+      {csvData.length > 0 && (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                {headers.map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.length > 0 ? (
+                sortedData.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={headers.length}>No results found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CSVTable;
