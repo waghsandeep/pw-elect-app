@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/pw-elect-app/static/css/main.9a158048.css",
+    "main.js": "/pw-elect-app/static/js/main.9d13d5bf.js",
+    "static/js/488.b5c35c33.chunk.js": "/pw-elect-app/static/js/488.b5c35c33.chunk.js",
+    "index.html": "/pw-elect-app/index.html",
+    "main.9a158048.css.map": "/pw-elect-app/static/css/main.9a158048.css.map",
+    "main.9d13d5bf.js.map": "/pw-elect-app/static/js/main.9d13d5bf.js.map",
+    "488.b5c35c33.chunk.js.map": "/pw-elect-app/static/js/488.b5c35c33.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9a158048.css",
+    "static/js/main.9d13d5bf.js"
+  ]
+}
