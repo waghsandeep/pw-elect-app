@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/pw-elect-app/static/css/main.9a158048.css",
-    "main.js": "/pw-elect-app/static/js/main.df90c307.js",
-    "static/js/488.2d87a6fb.chunk.js": "/pw-elect-app/static/js/488.2d87a6fb.chunk.js",
+    "main.js": "/pw-elect-app/static/js/main.a1b3ff12.js",
+    "static/js/488.b5c35c33.chunk.js": "/pw-elect-app/static/js/488.b5c35c33.chunk.js",
     "index.html": "/pw-elect-app/index.html",
     "main.9a158048.css.map": "/pw-elect-app/static/css/main.9a158048.css.map",
-    "main.df90c307.js.map": "/pw-elect-app/static/js/main.df90c307.js.map",
-    "488.2d87a6fb.chunk.js.map": "/pw-elect-app/static/js/488.2d87a6fb.chunk.js.map"
+    "main.a1b3ff12.js.map": "/pw-elect-app/static/js/main.a1b3ff12.js.map",
+    "488.b5c35c33.chunk.js.map": "/pw-elect-app/static/js/488.b5c35c33.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9a158048.css",
-    "static/js/main.df90c307.js"
+    "static/js/main.a1b3ff12.js"
   ]
 }
