@@ -1,113 +1,167 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import './App.css';  // Assuming external CSS file for styling
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import './App.css';
 
 const CSVTable = () => {
   const [csvData, setCsvData] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Columns to ignore (by name)
+  // Columns to ignore
   const columnsToIgnore = [
-    'E_FIRST_NAME', 'E_MIDDLE_NAME', 'E_LAST_NAME', 'MOBILE_NO1',
-    'HOUSE_NO', 'L_ADDRESS'
+    'AC_NUMBER',
+    'PART_NUMBER',
+    'SERIAL_NO_IN_PART',
+    'SERIAL_NO_IN_WARD',
+    'AGE'
   ];
 
-  // Fetch the CSV file from the public folder
+  // Fetch CSV
   useEffect(() => {
     const fetchCSVData = async () => {
       try {
-        const response = await fetch('/data.csv'); // Fetching from the public folder
+        const response = await fetch(
+          `${process.env.PUBLIC_URL}/pawane gaon ward list csv.csv`
+        );
         const csvText = await response.text();
 
-        // Parse the CSV data
         Papa.parse(csvText, {
           complete: (result) => {
             const data = result.data;
             const headerRow = data[0];
 
-            // Remove unwanted columns based on names in the columnsToIgnore list
-            const filteredHeaders = headerRow.filter((header) => !columnsToIgnore.includes(header));
-            const filteredData = data.slice(1).map((row) =>
-              row.filter((_, index) => !columnsToIgnore.includes(headerRow[index]))
+            const filteredHeaders = headerRow.filter(
+              (h) => !columnsToIgnore.includes(h)
             );
 
-            setHeaders(filteredHeaders);  // Set filtered headers
-            setCsvData(filteredData);     // Set filtered data
+            const filteredData = data.slice(1).map((row) =>
+              row.filter(
+                (_, index) => !columnsToIgnore.includes(headerRow[index])
+              )
+            );
+
+            setHeaders(filteredHeaders);
+            setCsvData(filteredData);
           },
-          header: false, // Don't treat the first row as headers in raw data
+          header: false,
         });
       } catch (error) {
         console.error('Error fetching CSV:', error);
       }
     };
 
-    fetchCSVData();  // Fetch and parse the CSV file
+    fetchCSVData();
   }, []);
 
-  // Function to handle search query change
+  // Search
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Filter the data based on the search query (searching through full name and VCARDID columns)
+  // Filter data
   const filteredData = csvData.filter((row) => {
-    // Split the search query into words
+    if (!searchQuery) return true;
+
     const queryWords = searchQuery.toLowerCase().split(' ').filter(Boolean);
 
-    // Get the relevant columns for searching (L_FULLNAME, E_FULLNAME, and VCARDID)
-    const fullNameColumns = [
-      row[headers.indexOf('L_FULLNAME')],
-      row[headers.indexOf('E_FULLNAME')],
-      row[headers.indexOf('VCARDID')],
-        row[headers.indexOf('VCARDID')]// Include VCARDID column for searching
-    ];
+    const searchableValues = [
+      row[headers.indexOf('VOTER_FULL_NAME')],
+      row[headers.indexOf('FULLNAME_MARATHI')],
+      row[headers.indexOf('EPIC_NO')],
+    ].filter(Boolean);
 
-    // Iterate through the query words and check if any match with any column
-    return queryWords.every(queryWord =>
-      fullNameColumns.some(column =>
-        column && column.toLowerCase().includes(queryWord) // Match query word with full name or VCARDID
+    return queryWords.every((word) =>
+      searchableValues.some((value) =>
+        value.toLowerCase().includes(word)
       )
     );
   });
 
-  // Sort the filtered data: first by age (descending), then by "SRNO" (ascending)
-  const sortedData = filteredData
+  // Sort data
+  const sortedData = [...filteredData]
     .sort((a, b) => {
-      // Sorting by "SRNO" second (ascending order)
-      const srnoA = parseInt(a[headers.indexOf('SRNO')], 10);
-      const srnoB = parseInt(b[headers.indexOf('SRNO')], 10);
-      return srnoA - srnoB;
+      const srA = parseInt(a[headers.indexOf('SERIAL_NO')], 10);
+      const srB = parseInt(b[headers.indexOf('SERIAL_NO')], 10);
+      return srA - srB;
     })
     .sort((a, b) => {
-      // Sorting by age first (descending order)
       const ageA = parseInt(a[headers.indexOf('AGE')], 10);
       const ageB = parseInt(b[headers.indexOf('AGE')], 10);
       if (!isNaN(ageA) && !isNaN(ageB)) {
-        return ageB - ageA; // Descending order (largest age first)
+        return ageB - ageA;
       }
-      return 0; // If age is missing or not a number, leave as is
-    })
+      return 0;
+    });
+
+  // Print PDF
+  const handlePrintPDF = () => {
+    const doc = new jsPDF('l', 'pt', 'a4');
+
+    doc.setFontSize(12);
+    doc.text('Pawane Gaon - Search Result', 40, 30);
+    doc.text(`Total Records: ${sortedData.length}`, 40, 50);
+
+    const voterNameIndex = headers.indexOf('VOTER_FULL_NAME');
+    const marathiNameIndex = headers.indexOf('FULLNAME_MARATHI');
+    const boothAddressIndex = headers.indexOf('BOOTH_ADDRESS');
+
+    doc.autoTable({
+      startY: 70,
+      head: [headers],
+      body: sortedData,
+
+      styles: {
+        fontSize: 7,
+        cellPadding: 3,
+        overflow: 'linebreak',
+        valign: 'middle',
+      },
+
+      columnStyles: {
+        [voterNameIndex]: {
+          cellWidth: 150,
+        },
+        [marathiNameIndex]: {
+          cellWidth: 150,
+        },
+        [boothAddressIndex]: {
+          cellWidth: 200, // ✅ Address needs more space
+        },
+      },
+
+      headStyles: {
+        fillColor: [22, 160, 133],
+        fontStyle: 'bold',
+      },
+
+      margin: { left: 20, right: 20 },
+      tableWidth: 'auto',
+    });
+
+    doc.save('pawane_search_result.pdf');
+  };
 
   return (
     <div className="container">
-      <h1 className="title">CSV Data Search and Display</h1>
-
       <div className="search-container">
-        {/* Search Input */}
         <input
           type="text"
-          placeholder="Search by Full Name or VCARDID"
+          placeholder="Search by Full Name or EPIC_NO"
           value={searchQuery}
           onChange={handleSearchChange}
           className="search-input"
         />
-        {/* Display the count of results in the top-right corner */}
+
         <div className="result-count">
           <span>{sortedData.length} results found</span>
         </div>
       </div>
 
+
+
+      {/* Table */}
       {csvData.length > 0 && (
         <div className="table-container">
           <table className="data-table">
