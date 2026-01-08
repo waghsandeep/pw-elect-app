@@ -1,15 +1,21 @@
 {
   "files": {
     "main.css": "/pw-elect-app/static/css/main.f971759f.css",
-    "main.js": "/pw-elect-app/static/js/main.c70eac7b.js",
-    "static/js/488.b5c35c33.chunk.js": "/pw-elect-app/static/js/488.b5c35c33.chunk.js",
+    "main.js": "/pw-elect-app/static/js/main.6003af9b.js",
+    "static/js/239.8820043f.chunk.js": "/pw-elect-app/static/js/239.8820043f.chunk.js",
+    "static/js/977.2f25f377.chunk.js": "/pw-elect-app/static/js/977.2f25f377.chunk.js",
+    "static/js/455.00493d46.chunk.js": "/pw-elect-app/static/js/455.00493d46.chunk.js",
+    "static/js/488.9295e069.chunk.js": "/pw-elect-app/static/js/488.9295e069.chunk.js",
     "index.html": "/pw-elect-app/index.html",
     "main.f971759f.css.map": "/pw-elect-app/static/css/main.f971759f.css.map",
-    "main.c70eac7b.js.map": "/pw-elect-app/static/js/main.c70eac7b.js.map",
-    "488.b5c35c33.chunk.js.map": "/pw-elect-app/static/js/488.b5c35c33.chunk.js.map"
+    "main.6003af9b.js.map": "/pw-elect-app/static/js/main.6003af9b.js.map",
+    "239.8820043f.chunk.js.map": "/pw-elect-app/static/js/239.8820043f.chunk.js.map",
+    "977.2f25f377.chunk.js.map": "/pw-elect-app/static/js/977.2f25f377.chunk.js.map",
+    "455.00493d46.chunk.js.map": "/pw-elect-app/static/js/455.00493d46.chunk.js.map",
+    "488.9295e069.chunk.js.map": "/pw-elect-app/static/js/488.9295e069.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f971759f.css",
-    "static/js/main.c70eac7b.js"
+    "static/js/main.6003af9b.js"
   ]
 }
