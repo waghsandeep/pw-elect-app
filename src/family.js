@@ -112,7 +112,7 @@ const FamilyHierarchyTable = () => {
         new Map(familyMembers.map((p) => [p.VCARDID, p])).values()
       );
 
-      if (uniqueFamily.length >= 3 && uniqueFamily.length <= 6) {
+      if (uniqueFamily.length >= 6 && uniqueFamily.length <= 15) {
         uniqueFamily.sort((a, b) => (parseInt(b.AGE) || 0) - (parseInt(a.AGE) || 0));
         uniqueFamily.forEach((person) => {
           finalRows.push({
