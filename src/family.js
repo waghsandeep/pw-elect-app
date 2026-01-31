@@ -109,16 +109,16 @@ const FamilyHierarchyTable = () => {
       });
 
       const uniqueFamily = Array.from(
-        new Map(familyMembers.map((p) => [p.VCARDID, p])).values()
+        new Map(familyMembers.map((p) => [p.EPIC_NO, p])).values()
       );
 
-      if (uniqueFamily.length >= 6 && uniqueFamily.length <= 15) {
+      if (uniqueFamily.length >= 3 && uniqueFamily.length <= 15) {
         uniqueFamily.sort((a, b) => (parseInt(b.AGE) || 0) - (parseInt(a.AGE) || 0));
         uniqueFamily.forEach((person) => {
           finalRows.push({
             isDivider: false,
             ...person,
-            MOBILE: person.MOBILE?.trim() || generateRandomMobile(),
+            MOBILE: person.MOBILE?.trim(),
           });
         });
         finalRows.push({ isDivider: true }); // Add divider
@@ -143,9 +143,9 @@ const FamilyHierarchyTable = () => {
         >
           <thead style={{ background: "#f0f0f0" }}>
             <tr>
-              <th>VCARDID</th>
-              <th>Part</th>
-              <th>Sr.No</th>
+              <th>EPIC_NO</th>
+              <th>BOOTH_NO</th>
+              <th>SERIAL_NO</th>
               <th>SEX</th>
               <th>AGE</th>
               <th>L_FULLNAME</th>
@@ -161,9 +161,9 @@ const FamilyHierarchyTable = () => {
                 </tr>
               ) : (
                 <tr key={idx}>
-                  <td>{row.VCARDID}</td>
-                  <td>{row.PART_NO}</td>
-                  <td>{row.SRNO}</td>
+                  <td>{row.EPIC_NO}</td>
+                  <td>{row.BOOTH_NO}</td>
+                  <td>{row.SERIAL_NO}</td>
                   <td>{row.SEX}</td>
                   <td>{row.AGE}</td>
                   <td>{row.L_FULLNAME}</td>
